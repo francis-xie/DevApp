@@ -1,0 +1,51 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+  repositories {
+    mavenLocal()
+    maven { url 'https://maven.aliyun.com/repository/google' }
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+    maven { url 'https://maven.aliyun.com/repository/jcenter' }
+    maven { url 'https://repo1.maven.org/maven2/' }
+    maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
+    maven { url 'https://jitpack.io' }
+    google()
+    mavenCentral()
+    gradlePluginPortal()
+    //jcenter() // Warning: this repository is going to shut down soon
+  }
+  dependencies {
+    //Android Gradle 插件 8.9.0
+    //https://developer.android.google.cn/build/releases/agp-8-9-0-release-notes?hl=zh-cn
+    classpath "com.android.tools.build:gradle:8.9.0"
+    //Kotlin Gradle 插件 (KGP) 与可用 Gradle 版本的兼容性
+    //https://book.kotlincn.net/text/gradle-configure-project.html
+    //https://developer.android.google.cn/jetpack/androidx/releases/compose-kotlin?hl=zh-cn
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.10"
+    classpath "com.google.dagger:hilt-android-gradle-plugin:2.56"
+
+    // NOTE: Do not place your application dependencies here; they belong
+    // in the individual module build.gradle files
+  }
+}
+
+allprojects {
+  repositories {
+    mavenLocal()
+    maven { url 'https://maven.aliyun.com/repository/google' }
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+    maven { url 'https://maven.aliyun.com/repository/jcenter' }
+    maven { url 'https://repo1.maven.org/maven2/' }
+    maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
+    maven { url 'https://jitpack.io' }
+    google()
+    mavenCentral()
+    gradlePluginPortal()
+    //jcenter() // Warning: this repository is going to shut down soon
+  }
+}
+
+task clean(type: Delete) {
+  delete rootProject.buildDir
+}
