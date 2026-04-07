@@ -2,22 +2,68 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
+  <!-- 网络权限 -->
   <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+  <!-- 通知权限 (Android 13+) -->
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+  <!-- 引导完成权限 -->
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+  <!-- 前台服务权限 -->
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+  <!-- 唤醒锁（用于 WorkManager 定时任务） -->
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+  <!-- 平板特性 -->
+  <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
+  <uses-feature android:name="android.hardware.screen.landscape" android:required="false"/>
 
-  <application android:allowBackup="true"
+  <application android:name=".App"
+               android:allowBackup="true"
                android:icon="@mipmap/ic_launcher"
                android:label="@string/app_name"
                android:roundIcon="@mipmap/ic_launcher_round"
                android:supportsRtl="true"
                android:theme="@style/Theme.DevApp">
+
+    <!-- 主 Activity - 横屏 + 常亮 -->
     <activity android:name=".MainActivity"
-              android:exported="true" android:label="@string/app_name"
+              android:exported="true"
+              android:label="@string/app_name"
+              android:screenOrientation="landscape"
+              android:configChanges="orientation|screenSize|keyboardHidden"
               android:theme="@style/Theme.DevApp">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
+
+    <!-- FileProvider - 用于分享 APK 文件 -->
+    <provider android:name="androidx.core.content.FileProvider"
+              android:authorities="${applicationId}.fileprovider"
+              android:exported="false" android:grantUriPermissions="true">
+      <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths"/>
+    </provider>
+
+    <!-- 引导完成接收器 -->
+    <receiver android:name=".receiver.BootCompletedReceiver" android:exported="true" android:enabled="true">
+      <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED"/>
+      </intent-filter>
+    </receiver>
+
+    <!-- 应用更新接收器 -->
+    <receiver android:name=".receiver.AppUpdateReceiver" android:exported="true" android:enabled="true">
+      <intent-filter>
+        <action android:name="android.intent.action.PACKAGE_REPLACED"/>
+        <action android:name="android.intent.action.PACKAGE_INSTALL"/>
+        <action android:name="android.intent.action.PACKAGE_REMOVED"/>
+        <data android:scheme="package"/>
+      </intent-filter>
+    </receiver>
+
   </application>
 
 </manifest>

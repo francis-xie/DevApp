@@ -23,6 +23,7 @@ buildscript {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.10"
     // Hilt 插件
     classpath "com.google.dagger:hilt-android-gradle-plugin:2.56"
+    classpath "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:2.1.10-1.0.31"
     //classpath "org.jetbrains.kotlin:kotlin-compose-compiler-plugin:2.1.10"
 
     // NOTE: Do not place your application dependencies here; they belong
