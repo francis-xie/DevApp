@@ -38,19 +38,22 @@ class OrderRepositoryImpl @Inject constructor(
     return try {
       // 检查网络状态
       if (!NetworkStateHolder.isConnected) {
-        AppLogger.w(TAG, "无网络连接，返回缓存数据")
+        AppLogger.w(TAG, "[getNewOrders] 无网络连接，返回缓存数据")
         return getCachedNewOrders()
       }
 
+      AppLogger.d(TAG, "[getNewOrders] 开始获取新订单列表")
+      
       // 尝试从网络获取
       val orders = orderNetworkDataSource.getNewOrders()
 
       // 保存到本地缓存
       cacheOrders(orders)
 
+      AppLogger.d(TAG, "[getNewOrders] 获取成功，订单数: ${orders.size}")
       Result.Success(orders)
     } catch (e: Exception) {
-      AppLogger.e(TAG, "获取新订单失败，使用缓存", e)
+      AppLogger.e(TAG, "[getNewOrders] 获取失败: ${e.message}", e)
       getCachedNewOrders()
     }
   }
@@ -97,23 +100,31 @@ class OrderRepositoryImpl @Inject constructor(
   override suspend fun getOrderDetail(orderId: String): Result<Order> {
     return try {
       if (!NetworkStateHolder.isConnected) {
+        AppLogger.w(TAG, "[getOrderDetail:$orderId] 无网络连接，尝试获取缓存")
         val cached = getOrderDetailFromCache(orderId)
         if (cached != null) {
+          AppLogger.d(TAG, "[getOrderDetail:$orderId] 命中缓存")
           return Result.Success(cached)
         }
+        AppLogger.w(TAG, "[getOrderDetail:$orderId] 无缓存")
         return Result.Error(-1, "无网络且无缓存")
       }
 
+      AppLogger.d(TAG, "[getOrderDetail:$orderId] 开始获取订单详情")
+      
       val orders = orderNetworkDataSource.getNewOrders()
       val order = orders.find { it.id == orderId }
 
       if (order != null) {
         cacheOrder(order)
+        AppLogger.d(TAG, "[getOrderDetail:$orderId] 获取成功")
         Result.Success(order)
       } else {
+        AppLogger.w(TAG, "[getOrderDetail:$orderId] 订单不存在")
         Result.Error(404, "订单不存在")
       }
     } catch (e: Exception) {
+      AppLogger.e(TAG, "[getOrderDetail:$orderId] 获取失败: ${e.message}", e)
       val cached = getOrderDetailFromCache(orderId)
       if (cached != null) {
         Result.Success(cached)
@@ -136,21 +147,26 @@ class OrderRepositoryImpl @Inject constructor(
   override suspend fun acceptOrder(orderId: String): Result<Order> {
     return try {
       if (!NetworkStateHolder.isConnected) {
+        AppLogger.w(TAG, "[acceptOrder:$orderId] 无网络连接，离线接单")
         // 离线模式：标记本地订单状态，待网络恢复后同步
         offlineAcceptOrder(orderId)
         val cached = getOrderDetailFromCache(orderId)
         return if (cached != null) {
           Result.Success(cached)
         } else {
-          Result.Error(AppException.NoNetwork.code, "无网络且无缓存")
+          Result.Error(-1, "无网络且无缓存")
         }
       }
 
+      AppLogger.d(TAG, "[acceptOrder:$orderId] 开始接单")
+      
       val order = orderNetworkDataSource.acceptOrder(orderId)
       // 更新本地缓存
       cacheOrder(order)
+      AppLogger.d(TAG, "[acceptOrder:$orderId] 接单成功")
       Result.Success(order)
     } catch (e: Exception) {
+      AppLogger.e(TAG, "[acceptOrder:$orderId] 接单失败: ${e.message}", e)
       // 尝试使用缓存
       val cached = getOrderDetailFromCache(orderId)
       if (cached != null) {
@@ -180,15 +196,20 @@ class OrderRepositoryImpl @Inject constructor(
   override suspend fun cancelOrder(orderId: String, reason: String): Result<Unit> {
     return try {
       if (!NetworkStateHolder.isConnected) {
+        AppLogger.w(TAG, "[cancelOrder:$orderId] 无网络连接，离线取消")
         offlineCancelOrder(orderId, reason)
         return Result.Success(Unit)
       }
 
+      AppLogger.d(TAG, "[cancelOrder:$orderId] 开始取消订单")
+      
       orderNetworkDataSource.cancelOrder(orderId, reason)
       // 更新本地缓存
       orderDao.updateOrderStatus(orderId, "CANCELLED")
+      AppLogger.d(TAG, "[cancelOrder:$orderId] 取消成功")
       Result.Success(Unit)
     } catch (e: Exception) {
+      AppLogger.e(TAG, "[cancelOrder:$orderId] 取消失败: ${e.message}", e)
       // 离线取消
       offlineCancelOrder(orderId, reason)
       Result.Success(Unit)
