@@ -68,16 +68,19 @@ class App : Application() {
     /**
      * 获取 Application 实例
      */
-    fun getApp(): Application = instance
+    @JvmStatic
+    fun get(): Application = instance
 
     /**
      * 获取 Application Context
      */
+    @JvmStatic
     fun getContext(): Context = instance.applicationContext
 
     /**
      * 获取当前活动的 Activity
      */
+    @JvmStatic
     fun getCurrentActivity(): Activity? = currentActivity
 
     /**
@@ -89,6 +92,7 @@ class App : Application() {
     /**
      * 是否在前台
      */
+    @JvmStatic
     fun isForeground(): Boolean = currentActivity != null
 
     /**
