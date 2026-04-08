@@ -20,7 +20,7 @@ android {
     versionName "1.0"
 
     // API 基础地址配置
-    buildConfigField "String", "BASE_URL", "\"https://api.example.com/\""
+    buildConfigField "String", "BASE_URL", "\"https://www.baidu.com/\""
 
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
